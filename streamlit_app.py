@@ -8,61 +8,59 @@ st.markdown("This dashboard summarizes model outputs explaining variation in men
 
 def show_image_with_text(title, img_path, desc):
     st.subheader(title)
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.image(img_path, use_column_width=True)
-    with col2:
-        st.markdown(desc)
+    st.image(img_path, use_container_width=True)
+    st.markdown(desc)
 
+# Map of visuals and their interpretations
 image_info = {
     "GLM Coefficient Plot": (
         "GLM_Results/GLM_Coefficient_Plot_with_EffectSize.png",
-        "This plot shows GLM-estimated log effects with 95% CI. Positive effects (right of red line) imply higher mentorship hours. Stars show statistical significance."
+        "This plot shows log effects of predictors with 95% CI. Positive effects suggest more mentorship hours. Stars show significance: ***p<0.001, **p<0.01, *p<0.05."
     ),
     "Random Forest: Predicted vs Actual": (
         "RandomForest_LogTransformed_Results/Predicted_vs_Actual.png",
-        "Prediction alignment with real values. Most predictions fall under 40 hours. Strong alignment in the 5–30 hour range."
+        "Points near the red line show better predictions. RF performs well for 5–30 hours, but underestimates >40 hours."
     ),
     "Random Forest: Residuals vs Predicted": (
         "RandomForest_LogTransformed_Results/Residuals.png",
-        "Residuals (errors) spread around zero, but higher predictions show underestimation bias."
+        "Residuals show underestimation for high predicted hours. RF error grows past 25–30 hours."
     ),
     "Random Forest: Top Feature Importances": (
         "RandomForest_LogTransformed_Results/Top15_Feature_Importance.png",
-        "Top predictors include Race_BlackAA, CareerStage_6.0, and InstitutionType_7."
+        "Top predictors: Race_BlackAA, CareerStage_6.0, and InstitutionType_7. Career progression dominates influence."
     ),
     "XGBoost (Log): Predicted vs Actual": (
         "XGBoost_LogTransformed/Predicted_vs_Actual.png",
-        "Better prediction alignment than Random Forest. Very high mentorship hours still underpredicted."
+        "Better alignment than RF. Model fits more evenly across mid-range mentorship values."
     ),
     "XGBoost (Log): Residuals vs Predicted": (
         "XGBoost_LogTransformed/Residuals.png",
-        "Residuals tighter and more symmetric. Model handles mid-range values (10–30) effectively."
+        "Tighter, more symmetric residuals. Some underestimation for high values remains, but bias reduced."
     ),
     "XGBoost (Log): Top Feature Importances": (
         "XGBoost_LogTransformed/Top15_Feature_Importance.png",
-        "CareerStage_6.0, Race_BlackAA, and InstitutionType_1 dominate the model's decision-making."
+        "CareerStage_6.0 and Race_BlackAA dominate. Institutional type is still significant."
     ),
     "XGBoost (Original): Predicted vs Actual": (
         "XGBoost_Original/Predicted_vs_Actual.png",
-        "Slightly more error and scatter than log-transformed version, especially for extreme values."
+        "Wider spread vs log-transformed version. Underestimates upper tail of mentorship hours."
     ),
     "XGBoost (Original): Residuals vs Predicted": (
         "XGBoost_Original/Residuals.png",
-        "Residuals more variable than log version. Greater bias with higher predictions."
+        "Residual spread and bias increase at high predicted values. Suggests worse generalization."
     ),
     "XGBoost (Original): Top Feature Importances": (
         "XGBoost_Original/Top15_Feature_Importance.png",
-        "CareerStage_5.0, CareerStage_2.0, and InstitutionType_7 stand out. Race and gender matter less."
+        "CareerStage_5.0 leads. Institutional types still important, though gender and race drop slightly."
     )
 }
 
+# Render each section
 for title, (img, desc) in image_info.items():
     show_image_with_text(title, img, desc)
 
-
-# Narrative Report Section
+# Append full interpretation section at the end
 st.markdown("---")
-with st.expander("📄 Model Insights Report (Click to Expand)", expanded=False):
+with st.expander("📄 Full Visual Report Summary (Narrative)", expanded=False):
     with open("model_report.md", "r") as f:
         st.markdown(f.read())
