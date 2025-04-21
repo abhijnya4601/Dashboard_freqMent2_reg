@@ -5,10 +5,10 @@ import os
 # Utility to load image and caption together
 def plot_with_caption(img_path, caption):
     try:
-        st.image(Image.open(img_path), use_container_width=True)
+        st.image(Image.open(os.path.join("images", img_path)), use_container_width=True)
         st.markdown(caption, unsafe_allow_html=True)
     except FileNotFoundError:
-        st.warning(f"Image not found: {img_path}")
+        st.error(f"Image not found: {img_path}")
 
 st.set_page_config(page_title="Mentorship Modeling Dashboard", layout="wide")
 st.title("📊 Mentorship Hours Modeling Dashboard (with Institution Type)")
@@ -17,6 +17,7 @@ st.markdown("This dashboard summarizes model outputs explaining variation in men
 # GLM Plot
 st.header("GLM Coefficient Plot")
 plot_with_caption("GLM_Coefficient_Plot_with_EffectSize.png", """
+**Interpretation**:<br>
 - **Horizontal lines**: represent the 95% confidence interval of the estimated effect.<br>
 - **Black dots**: show the point estimate (log effect) for each factor.<br>
 - **Red dashed vertical line at 0**: indicates the no-effect line (baseline).<br>
@@ -25,7 +26,7 @@ plot_with_caption("GLM_Coefficient_Plot_with_EffectSize.png", """
 - <b>CareerStage_6.0, Race_BlackAA</b> show negative effects.
 """)
 
-# Random Forest Plots
+# Random Forest
 st.header("Random Forest: Predicted vs Actual")
 plot_with_caption("RF_Predicted_vs_Actual.png", """
 - Predicted mentorship hours vs. actual (after log transformation reversal).<br>
@@ -45,7 +46,7 @@ plot_with_caption("RF_Top15_Feature_Importance.png", """
 - CareerStage_6.0, InstitutionType_7, and Gender_2.0 also influential.
 """)
 
-# XGBoost (Log-Transformed Target)
+# XGBoost Log
 st.header("XGBoost (Log-Transformed): Predicted vs Actual")
 plot_with_caption("XGB_Log_Predicted_vs_Actual.png", """
 - Tighter clustering near diagonal.<br>
@@ -64,7 +65,7 @@ plot_with_caption("XGB_Log_Top15_Feature_Importance.png", """
 - Balanced importance among race, career stage, institution types.
 """)
 
-# XGBoost (Original Target)
+# XGBoost Original
 st.header("XGBoost (Original): Predicted vs Actual")
 plot_with_caption("XGB_Original_Predicted_vs_Actual.png", """
 - Less clustered than log-transformed.<br>
