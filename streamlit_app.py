@@ -6,7 +6,7 @@ import os
 def plot_with_caption(img_folder, img_filename, caption):
     try:
         img_path = os.path.join(img_folder, img_filename)
-        st.image(Image.open(img_path), use_container_width=True)
+        st.image(Image.open(img_path), width=700)
         st.markdown(caption, unsafe_allow_html=True)
     except FileNotFoundError:
         st.error(f"Image not found: {img_path}")
@@ -22,65 +22,71 @@ plot_with_caption("GLM_Results", "GLM_Coefficient_Plot_with_EffectSize.png", """
 - **Horizontal lines**: represent the 95% confidence interval of the estimated effect.<br>
 - **Black dots**: show the point estimate (log effect) for each factor.<br>
 - **Red dashed vertical line at 0**: indicates the no-effect line (baseline).<br>
-- **Stars (*, **, ***)**: indicate significance levels (<i>p < 0.05, 0.01, 0.001</i>)<br>
-- <b>CareerStage_5.0</b>, <b>Gender_1.0</b>, <b>InstitutionType_1</b> → Strong positive predictors.<br>
-- <b>CareerStage_6.0</b>, <b>Race_BlackAA</b> → Significant negative effects.
+- **Stars (*, **, ***)**: indicate significance levels (<i>p < 0.05, 0.01, 0.001</i>).<br>
+- Positive effects (right of the red line) indicate increased mentorship hours.<br>
+- Notable positives: <b>CareerStage_5.0</b>, <b>Gender_1.0</b>, <b>InstitutionType_1</b>.<br>
+- Notable negatives: <b>CareerStage_6.0</b>, <b>Race_BlackAA</b>.
 """)
 
 # === Random Forest ===
 st.subheader("Random Forest: Predicted vs Actual")
 plot_with_caption("RandomForest_LogTransformed_Results", "Predicted_vs_Actual.png", """
-- Predicted vs actual mentorship hours (inverse log transformed).<br>
-- **Red dashed diagonal** = ideal predictions.<br>
-- Model underestimates values > 40 hours.
+- This plot compares predicted vs. actual mentorship hours using inverse-log-transformed values.<br>
+- **Red dashed line** indicates ideal predictions.<br>
+- Strong alignment below 40 hours, but poor fit for higher mentorship hours.
 """)
 
 st.subheader("Random Forest: Residuals vs Predicted")
 plot_with_caption("RandomForest_LogTransformed_Results", "Residuals.png", """
-- Residual = actual - predicted.<br>
-- Negative residual curve beyond ~25 hrs shows underestimation.
+- Residuals (errors) plotted against predicted values.<br>
+- Most values hover around 0 (ideal).<br>
+- Increasing underestimation trend visible past 25 hours.
 """)
 
 st.subheader("Random Forest: Top Feature Importances")
 plot_with_caption("RandomForest_LogTransformed_Results", "Top15_Feature_Importance.png", """
-- Top: <b>Race_BlackAA</b>, <b>CareerStage_6.0</b>, <b>InstitutionType_7</b>.<br>
-- Institutional data adds substantial predictive power.
+- Top predictive features ranked by importance.<br>
+- <b>Race_BlackAA</b> and <b>CareerStage_6.0</b> lead, followed by <b>InstitutionType_7</b>.<br>
+- Institution variables contribute meaningfully to model performance.
 """)
 
 # === XGBoost Log ===
 st.subheader("XGBoost (Log-Transformed): Predicted vs Actual")
 plot_with_caption("XGBoost_LogTransformed", "Predicted_vs_Actual.png", """
-- More accurate alignment with the diagonal.<br>
-- Log transformation helps mitigate outlier influence.
+- Higher accuracy alignment than Random Forest.<br>
+- Red dashed diagonal = perfect predictions.<br>
+- Performance robust for 5–30 mentorship hour range.
 """)
 
 st.subheader("XGBoost (Log): Residuals vs Predicted")
 plot_with_caption("XGBoost_LogTransformed", "Residuals.png", """
-- Residuals concentrated 10–30 hours → tighter fit.<br>
-- Less bias vs. Random Forest.
+- Tighter spread of residuals → less bias.<br>
+- Minor skew post-30 hours, but overall improvement vs Random Forest.
 """)
 
 st.subheader("XGBoost (Log): Top Feature Importances")
 plot_with_caption("XGBoost_LogTransformed", "Top15_Feature_Importance.png", """
-- Dominant: <b>CareerStage_6.0</b>, <b>Race_BlackAA</b>, <b>InstitutionType_1</b>.<br>
-- Strong mix of institutional + demographic drivers.
+- Top drivers: <b>CareerStage_6.0</b>, <b>Race_BlackAA</b>, <b>InstitutionType_1</b>.<br>
+- Strong mix of institutional and demographic predictors.<br>
+- More balanced compared to Random Forest.
 """)
 
 # === XGBoost Original ===
 st.subheader("XGBoost (Original): Predicted vs Actual")
 plot_with_caption("XGBoost_Original", "Predicted_vs_Actual.png", """
-- Moderate scatter.<br>
-- Log version performs better on upper values.
+- Predictions scatter more than log version.<br>
+- High mentorship hours are under-predicted more frequently.
 """)
 
 st.subheader("XGBoost (Original): Residuals vs Predicted")
 plot_with_caption("XGBoost_Original", "Residuals.png", """
-- Residuals increase sharply > 30 hours.<br>
-- Bias in high-prediction zone.
+- Significant residual variance above 30 hours.<br>
+- Model performs worse for mentors with high engagement.
 """)
 
 st.subheader("XGBoost (Original): Top Feature Importances")
 plot_with_caption("XGBoost_Original", "Top15_Feature_Importance.png", """
-- Leading: <b>CareerStage_5.0</b>, <b>InstitutionType_7</b>.<br>
-- Gender/race less dominant than in log version.
+- <b>CareerStage_5.0</b> dominates, followed by other career stages.<br>
+- Institutional type 7 still appears high, but race/gender diminish in ranking.<br>
+- Model may rely more on structural than demographic factors.
 """)
