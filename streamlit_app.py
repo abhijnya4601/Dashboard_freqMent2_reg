@@ -29,58 +29,58 @@ plot_with_caption("GLM_Results", "GLM_Coefficient_Plot_with_EffectSize.png", """
 
 # === Random Forest ===
 st.subheader("Random Forest: Predicted vs Actual")
-plot_with_caption("RandomForest_LogTransformed_Results", "RF_Predicted_vs_Actual.png", """
+plot_with_caption("RandomForest_LogTransformed_Results", "Predicted_vs_Actual.png", """
 - Predicted vs actual mentorship hours (inverse log transformed).<br>
 - **Red dashed diagonal** = ideal predictions.<br>
 - Model underestimates values > 40 hours.
 """)
 
 st.subheader("Random Forest: Residuals vs Predicted")
-plot_with_caption("RandomForest_LogTransformed_Results", "RF_Residuals_vs_Predicted.png", """
+plot_with_caption("RandomForest_LogTransformed_Results", "Residuals.png", """
 - Residual = actual - predicted.<br>
 - Negative residual curve beyond ~25 hrs shows underestimation.
 """)
 
 st.subheader("Random Forest: Top Feature Importances")
-plot_with_caption("RandomForest_LogTransformed_Results", "RF_Top15_Feature_Importance.png", """
+plot_with_caption("RandomForest_LogTransformed_Results", "Top15_Feature_Importance.png", """
 - Top: <b>Race_BlackAA</b>, <b>CareerStage_6.0</b>, <b>InstitutionType_7</b>.<br>
 - Institutional data adds substantial predictive power.
 """)
 
 # === XGBoost Log ===
 st.subheader("XGBoost (Log-Transformed): Predicted vs Actual")
-plot_with_caption("XGBoost_LogTransformed", "XGB_Log_Predicted_vs_Actual.png", """
+plot_with_caption("XGBoost_LogTransformed", "Predicted_vs_Actual.png", """
 - More accurate alignment with the diagonal.<br>
 - Log transformation helps mitigate outlier influence.
 """)
 
 st.subheader("XGBoost (Log): Residuals vs Predicted")
-plot_with_caption("XGBoost_LogTransformed", "XGB_Log_Residuals_vs_Predicted.png", """
+plot_with_caption("XGBoost_LogTransformed", "Residuals.png", """
 - Residuals concentrated 10–30 hours → tighter fit.<br>
 - Less bias vs. Random Forest.
 """)
 
 st.subheader("XGBoost (Log): Top Feature Importances")
-plot_with_caption("XGBoost_LogTransformed", "XGB_Log_Top15_Feature_Importance.png", """
+plot_with_caption("XGBoost_LogTransformed", "Top15_Feature_Importance.png", """
 - Dominant: <b>CareerStage_6.0</b>, <b>Race_BlackAA</b>, <b>InstitutionType_1</b>.<br>
 - Strong mix of institutional + demographic drivers.
 """)
 
 # === XGBoost Original ===
 st.subheader("XGBoost (Original): Predicted vs Actual")
-plot_with_caption("XGBoost_Original", "XGB_Original_Predicted_vs_Actual.png", """
+plot_with_caption("XGBoost_Original", "Predicted_vs_Actual.png", """
 - Moderate scatter.<br>
 - Log version performs better on upper values.
 """)
 
 st.subheader("XGBoost (Original): Residuals vs Predicted")
-plot_with_caption("XGBoost_Original", "XGB_Original_Residuals_vs_Predicted.png", """
+plot_with_caption("XGBoost_Original", "Residuals.png", """
 - Residuals increase sharply > 30 hours.<br>
 - Bias in high-prediction zone.
 """)
 
 st.subheader("XGBoost (Original): Top Feature Importances")
-plot_with_caption("XGBoost_Original", "XGB_Original_Top15_Feature_Importance.png", """
+plot_with_caption("XGBoost_Original", "Top15_Feature_Importance.png", """
 - Leading: <b>CareerStage_5.0</b>, <b>InstitutionType_7</b>.<br>
 - Gender/race less dominant than in log version.
 """)
