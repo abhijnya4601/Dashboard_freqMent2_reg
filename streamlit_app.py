@@ -1,100 +1,100 @@
 import streamlit as st
 from PIL import Image
+import os
 
-st.set_page_config(page_title="Mentorship Dashboard", layout="wide")
+st.set_page_config(page_title="Mentorship Modeling Dashboard", layout="wide")
 
 st.title("📊 Mentorship Hours Modeling Dashboard (with Institution Type)")
 st.markdown("This dashboard summarizes model outputs explaining variation in mentorship hours by career stage, gender, race, and institutional affiliation.")
 
-# Function to load and display image with explanation
 def plot_with_caption(img_path, caption):
-    st.image(Image.open(img_path), use_column_width=True)
-    st.markdown(caption)
+    if os.path.exists(img_path):
+        st.image(Image.open(img_path), caption=caption, use_container_width=True)
+    else:
+        st.warning(f"Image not found: `{img_path}`")
 
-# 1. GLM Coefficient Plot
-st.subheader("📊 GLM Coefficient Plot")
-plot_with_caption("GLM_Coefficient_Plot_with_EffectSize.png", """
-**Interpretation:**  
-- Horizontal lines = 95% confidence intervals  
-- Dots = log effect estimate  
-- Stars = significance (*p* < 0.05, **p* < 0.01, ***p* < 0.001)  
-- Positive log values imply increased mentorship hours  
-- `CareerStage_5.0`, `Gender_1.0`, and `InstitutionType_1` show strong positive effects  
-- `CareerStage_6.0`, `Race_BlackAA` indicate negative impact
+# === GLM Section ===
+st.header("GLM Coefficient Plot")
+plot_with_caption("GLM_Coefficient_Plot_with_EffectSize.png", 
+"""
+This plot shows GLM-estimated log effects with 95% CI. 
+Positive effects (right of red line) imply higher mentorship hours. 
+Stars show statistical significance.
 """)
 
-# 2. Random Forest
-st.subheader("🌲 Random Forest: Predicted vs Actual")
-plot_with_caption("Predicted_vs_Actual_RF.png", """
-**Interpretation:**  
-- Most values fall under 40 hours  
-- Red diagonal = ideal predictions  
-- Model underpredicts very high mentorship hours
+# === Random Forest Section ===
+st.header("Random Forest: Predicted vs Actual")
+plot_with_caption("RF_Predicted_vs_Actual.png", 
+"Prediction alignment with real values. Most predictions fall under 40 hours. Strong alignment in the 5–30 hour range.")
+
+st.header("Random Forest: Residuals vs Predicted")
+plot_with_caption("RF_Residuals_vs_Predicted.png", 
+"Residuals show how far predictions deviate from true values. Underestimation rises after 25 predicted hours.")
+
+st.header("Random Forest: Top Feature Importances")
+plot_with_caption("RF_Top15_Feature_Importance.png", 
+"Race_BlackAA, CareerStage_6.0, and institutional types show strong predictive power.")
+
+# === XGBoost (Log Transformed) ===
+st.header("XGBoost (Log-Transformed): Predicted vs Actual")
+plot_with_caption("XGB_Log_Predicted_vs_Actual.png", 
+"Better alignment with diagonal, especially in the 10–30 hour range. Few high-hour outliers.")
+
+st.header("XGBoost (Log): Residuals vs Predicted")
+plot_with_caption("XGB_Log_Residuals_vs_Predicted.png", 
+"Residuals mostly centered around 0. Symmetrical spread up to 40 hours.")
+
+st.header("XGBoost (Log): Top Feature Importances")
+plot_with_caption("XGB_Log_Top15_Feature_Importance.png", 
+"CareerStage_6.0 and Race_BlackAA top the list. Institution types add substantial value.")
+
+# === XGBoost (Original) ===
+st.header("XGBoost (Original): Predicted vs Actual")
+plot_with_caption("XGB_Original_Predicted_vs_Actual.png", 
+"More scatter in high-hour mentors. Alignment weaker compared to log-transformed model.")
+
+st.header("XGBoost (Original): Residuals vs Predicted")
+plot_with_caption("XGB_Original_Residuals_vs_Predicted.png", 
+"Bias appears in upper prediction range — residuals increase after 30 hours.")
+
+st.header("XGBoost (Original): Top Feature Importances")
+plot_with_caption("XGB_Original_Top15_Feature_Importance.png", 
+"CareerStage_5.0, mid-career and institutional affiliation drive predictions.")
+
+# === Report Section ===
+st.markdown("### 📄 Model Insights Report")
+with st.expander("Click to expand full narrative report"):
+    st.markdown("""
+#### ✏️ Objective
+To analyze how **career stage**, **gender**, **race**, and **institution types (1, 2, 3)** influence monthly mentorship hours (`Freq_Ment2_Hours_Clean`).
+
+#### 📊 GLM Coefficient Plot
+- **Horizontal lines** = 95% confidence intervals.
+- **Dots** = estimated effect (log scale).
+- **Red line** = no effect.
+- **Stars** = significance.
+- CareerStage_5.0, Gender_1.0, InstitutionType_1 show strong positive effects.
+- CareerStage_6.0, Race_BlackAA = negative effect on mentorship hours.
+
+#### 🔵 Random Forest
+- Predictions tightly clustered 5–30 hours.
+- Residuals show bias at upper ranges.
+- Top features: Race_BlackAA, CareerStage_6.0, multiple institution types.
+
+#### 🔶 XGBoost (Log)
+- Higher alignment with actual values.
+- Residuals more balanced.
+- Top features: CareerStage_6.0, Race_BlackAA, InstitutionType_1.
+
+#### 🔷 XGBoost (Original)
+- Struggles with higher mentorship predictions.
+- CareerStage_5.0 and institutional variables still highly important.
+
+---
+
+📌 **Conclusion**:
+- Career stage = dominant driver across all models.
+- Institution type boosts predictive accuracy.
+- Race and gender effects are nuanced and informative.
+- Log transformation improves accuracy, especially for tree-based models.
 """)
-
-st.subheader("🌲 Random Forest: Residuals vs Predicted")
-plot_with_caption("Residuals_RF.png", """
-**Interpretation:**  
-- Residuals ideally hover around 0  
-- Slight negative slope after 25 predicted hours — indicates underestimation for higher ranges
-""")
-
-st.subheader("🌲 Random Forest: Top 15 Feature Importances")
-plot_with_caption("Top15_Feature_Importance_RF.png", """
-**Interpretation:**  
-- `Race_BlackAA` and `CareerStage_6.0` dominate  
-- Institution types (`InstitutionType_1`, etc.) matter  
-- Gender has lesser predictive power
-""")
-
-# 3. XGBoost - Log Transformed
-st.subheader("⚡ XGBoost (Log): Predicted vs Actual")
-plot_with_caption("Predicted_vs_Actual_XGB_Log.png", """
-**Interpretation:**  
-- Tighter clustering along diagonal  
-- Better performance in 10–30 hour range  
-- Slight bias at very high actual values
-""")
-
-st.subheader("⚡ XGBoost (Log): Residuals vs Predicted")
-plot_with_caption("Residuals_XGB_Log.png", """
-**Interpretation:**  
-- Residuals more symmetric  
-- Outliers reduced in comparison to RF  
-- Slight bias above 40 predicted hours
-""")
-
-st.subheader("⚡ XGBoost (Log): Top 15 Feature Importances")
-plot_with_caption("Top15_Feature_Importance_XGB_Log.png", """
-**Interpretation:**  
-- `CareerStage_6.0`, `Race_BlackAA`, `InstitutionType_1` top the chart  
-- Shows good mix of career stage, race, and institution-based predictors
-""")
-
-# 4. XGBoost - Original Target
-st.subheader("🔷 XGBoost (Original): Predicted vs Actual")
-plot_with_caption("Predicted_vs_Actual_XGB_Orig.png", """
-**Interpretation:**  
-- Higher scatter at upper actual values  
-- Underperforms compared to log version
-""")
-
-st.subheader("🔷 XGBoost (Original): Residuals vs Predicted")
-plot_with_caption("Residuals_XGB_Orig.png", """
-**Interpretation:**  
-- Bias increases after ~30 predicted hours  
-- Positive skew indicates consistent underprediction
-""")
-
-st.subheader("🔷 XGBoost (Original): Top 15 Feature Importances")
-plot_with_caption("Top15_Feature_Importance_XGB_Orig.png", """
-**Interpretation:**  
-- `CareerStage_5.0`, `2.0`, and `3.0` dominate  
-- `InstitutionType_7` and `6` also rank high  
-- Gender and race have moderate influence
-""")
-
-# 5. Full Interpretive Report
-with st.expander("📄 Full Analysis Summary and Interpretation Report"):
-    st.markdown(open("full_analysis_report.txt").read())
-
